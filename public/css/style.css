@@ -1,0 +1,136 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #d5f2f2;
+    color: #000000;
+    margin: 0;
+    padding: 2rem;
+}
+
+.home {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+form, .results {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.05);
+}
+
+form {
+    text-align: left;
+}
+
+.results {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+h1 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2rem;
+    color: #792cd1;
+    margin-bottom: 2rem;
+}
+
+h2 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.75rem;
+    color: #792cd1;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.5rem;
+    color: #792cd1;
+    margin-bottom: 0.5rem;
+}
+
+h4 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: #333333;
+    font-weight: normal;
+    margin-bottom: 1rem;
+}
+
+.results p {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: #333333;
+    margin-bottom: 2rem;
+}
+
+label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+input[type="text"], textarea, input[type="file"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    border: 1px solid #bababa;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+}
+
+fieldset {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px dashed #bababa;
+    border-radius: 0.5rem;
+}
+
+.actions {
+    margin-bottom: 2rem;
+}
+
+button, .openSpotify, .homelink {
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    display: inline-block;
+    color: white;
+}
+
+button {
+    margin-top: 2rem;
+    cursor: pointer;
+}
+
+button, .openSpotify {
+    background-color: #04d435;
+}
+
+.homelink {
+    background-color: #d43b04;
+}
+
+.openSpotify, .homelink {
+    text-decoration: none;
+}
+
+button:hover, .openSpotify:hover {
+    background-color: #4cf573;
+}
+
+.results:hover {
+    background-color: #eb764b;
+}
+
+.embed {
+    border-radius: 1rem;
+    max-width: 100%;
+}
+
+#error {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}

@@ -67,7 +67,7 @@ router.route('/generate-playlist').post(upload.single('playlistImage'), async (r
         includeOps = includeOps === 'on';
         includeEds = includeEds === 'on';
         playlistName = playlistName === "" ? "My Anime Playlist" : playlistName;
-        playlistDescription = playlistDescription === "" ? "This Was created by DJ Waifu using my watchlist!" : playlistDescription;
+        playlistDescription = playlistDescription === "" ? "This was created by DJ Waifu using my watchlist!" : playlistDescription;
         if (!includeOps && !includeEds) {
             return res.status(400).render('home', { error: "Please select at least one theme type (OP or ED)." });
         }

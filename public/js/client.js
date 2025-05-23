@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const username = validString(usernameInput.value);
                 if (playlistName.value === "") playlistName.value = "My Anime Playlist";
-                if (playlistDescription.value === "") playlistDescription.value = "This Was created by DJ Waifu using my watchlist!";
+                if (playlistDescription.value === "") playlistDescription.value = "This was created by DJ Waifu using my watchlist!";
                 loading.hidden = false;
                 form.style.display = "none";
             } catch (error) {

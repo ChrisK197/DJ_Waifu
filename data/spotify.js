@@ -151,7 +151,7 @@ export const getSongsFromList = async (access_token, songList) => {
     }
 }
 
-export const createPlaylist = async (access_token, userId, songList, isPublic=false, name="My Anime Playlist", description="This Was created by DJ Waifu using my watchlist!") => {
+export const createPlaylist = async (access_token, userId, songList, isPublic=false, name="My Anime Playlist", description="This was created by DJ Waifu using my watchlist!") => {
     try {
         access_token = validString(access_token);
         //console.log("Access token:", access_token);
