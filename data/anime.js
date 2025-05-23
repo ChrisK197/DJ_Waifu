@@ -61,18 +61,23 @@ export const getThemesById = async (animeId) => {
             for (let op of themes) {
                 //console.log(op);
                 // AHHHHHH REGEX HELL I HATE REGEX RAAAAAAH I HATE MAL WHY DO THEY NOT HAVE CONSISTENT NAMING
-                let title, artist;
+                let match = "";
                 if (op.text.toLowerCase().includes(' by ')) {
                     if (op.text.toLowerCase().includes('"')) {
-                        [, title, artist] = op.text.match(/(?:#\d+:\s*)?"([^"]+)",?\s+by\s+([^(]+)?/i);
+                        match = op.text.match(/(?:#\d+:\s*)?"([^"]+)",?\s+by\s+([^(]+)?/i);
                     } else {
-                        [, title, artist] = op.text.match(/(?:#\d+:\s*)?([^\"]+?)\s+by\s+([^(]+)?/i);
+                        match = op.text.match(/(?:#\d+:\s*)?([^\"]+?)\s+by\s+([^(]+)?/i);
                     }
                 } else if (op.text.toLowerCase().includes('"by')) {
-                    [, title, artist] = op.text.match(/(?:#\d+:\s*)?"([^"]+)",?by\s+([^(]+)?/i);
+                    match = op.text.match(/(?:#\d+:\s*)?"([^"]+)",?by\s+([^(]+)?/i);
                 } else {
-                    [, title, artist] = op.text.match(/(?:#\d+:\s*)?"([^"]+)",?\s+([^(]+)?/i);
+                    match = op.text.match(/(?:#\d+:\s*)?"([^"]+)",?\s+([^(]+)?/i);
                 }
+                if (!match || match.length === 0) continue;
+                let [, title, artist] = match;
+                //console.log("Here");
+                if (!title) continue;
+                artist = artist || '';
                 
                 arr.push({
                     title: title.trim(),
