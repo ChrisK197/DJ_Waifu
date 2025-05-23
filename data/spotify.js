@@ -95,7 +95,7 @@ export const getSong = async (access_token, title, artist) => {
         `https://api.spotify.com/v1/search`,
         {
             headers: {
-                Authorization: `Bearer ${access_token}`,
+                'Authorization': `Bearer ${access_token}`,
             },
             params: {
                 q: `track:${title} artist:${artist}`,
@@ -125,11 +125,13 @@ export const getSongsFromList = async (access_token, songList) => {
     try {
         //console.log(access_token);
         access_token = validString(access_token);
+        //console.log(songList);
+        if (!songList || typeof songList !== 'object' || !Array.isArray(songList)) throw "Invalid songList";
         let allSongs = []
         // Structurally integral console log????
-        console.log(songList);
+        //console.log(songList);
         for (let song of songList) {
-            if (!song || !song.title) continue;
+            if (!song || typeof song !== 'object' || !song.title) continue;
             let title = validString(song.title);
             let artist = ""
             try {
@@ -138,6 +140,7 @@ export const getSongsFromList = async (access_token, songList) => {
                 artist = "";
             }
             let result = await getSong(access_token, title, artist);
+            //console.log(result);
             if (result !== null) allSongs.push(result.uri);
         }
         //console.log(allSongs);
@@ -154,6 +157,8 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
         //console.log("Access token:", access_token);
         userId = validString(userId);
         //console.log("User ID:", userId)
+        //console.log(songList);
+        if (!songList || typeof songList !== 'object' || !Array.isArray(songList)) throw "Invalid songList";
         //console.log(isPublic);
         //if (!isPublic || typeof isPublic !== 'boolean') throw 'isPublic must be a boolean';
         //console.log("Is public:", isPublic);
@@ -166,33 +171,36 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
             },
             {
                 headers: {
-                    Authorization: `Bearer ${access_token}`,
+                    'Authorization': `Bearer ${access_token}`,
                     'Content-Type': 'application/json',
                 },
             }
         );
-        //console.log(response.data);
+        //console.log(response.data.id);
 
         if (!response.data.id) throw "Failed to create playlist";
-        console.log("HERE!");
+        //console.log("HERE!");
+        //console.log(songList);
         let allSongs = await getSongsFromList(access_token, songList);
         //console.log(allSongs);
         //allSongs = allSongs.map(song => song.uri);
-        console.log(allSongs);
+        //console.log(allSongs);
         // Maximum of 100 items per request
         for (let i = 0; i < allSongs.length; i += 100) {
-            await axios.post(
+            //console.log(allSongs.slice(i, i + 100));
+            let res = await axios.post(
                 `https://api.spotify.com/v1/playlists/${response.data.id}/tracks`,
                 {
-                    uris: allSongs.slice(i, i + 100).join(','),
+                    'uris': allSongs.slice(i, i + 100),
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${access_token}`,
+                        'Authorization': `Bearer ${access_token}`,
                         'Content-Type': 'application/json',
                     },
                 }
             );
+            if (!res.data.snapshot_id) throw "Failed to add to playlist";
         }
         // playlist create response
         return response.data;

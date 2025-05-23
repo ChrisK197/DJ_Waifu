@@ -53,13 +53,12 @@ router.route('/generate-playlist').post(async (req, res) => {
         let { username, isPublic } = req.body;
         isPublic = (isPublic === "on");
         const access_token = await getValidAccessToken(req);
-        //console.log("Access token");
-        const animeList = await getThemesByUsername(username);
-        //console.log("Anime list")
-        const songList = await getSongsFromList(access_token, animeList);
-        //console.log("Song list")
+        //console.log("Access token:", access_token);
+        const songList = await getThemesByUsername(username);
+        //console.log("Song list:")
+        //console.log(songList)
         const playlistInfo = await createPlaylist(access_token, req.session.userId, songList, isPublic);
-        //console.log("Playlist")
+        console.log("Playlist Generated!")
         res.render('results', {playlist: playlistInfo})
     } catch (error) {
         console.error('Error creating playlist:', error);
