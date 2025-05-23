@@ -1,0 +1,9 @@
+<h2>Playlist Created!</h2>
+<h3>"My Anime Playlist"</h3>
+<a href="{{playlist.url}}" target="_blank">Open in Spotify</a>
+
+<ul>
+  {{#each playlist.tracks}}
+    <li>{{this.title}} by {{this.artist}}</li>
+  {{/each}}
+</ul>

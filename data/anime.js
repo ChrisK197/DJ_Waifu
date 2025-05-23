@@ -22,7 +22,7 @@ export const getAnimeList = async (username) => {
         });
         return response.data.data;
     } catch (error) {
-        console.error("Error fetching anime list: ", error.response.data || error.message);
+        console.error("Error fetching anime list: ", error);
         throw error;
     }
 }
@@ -44,7 +44,7 @@ export const getAnimeById = async (animeId) => {
             });
         return response.data;
     } catch (error) {
-        console.error("Error fetching anime by name: ", error.response.data || error.message);
+        console.error("Error fetching anime by id: ", error);
         throw error;
     }
 }
@@ -93,7 +93,7 @@ export const getThemesById = async (animeId) => {
             ending_themes: endingThemes
         };
     } catch (error) {
-        console.log(error);
+        console.log("Error fetching themes by id: ", error);
         throw error;
     }
 }
@@ -111,7 +111,7 @@ export const getThemesByUsername = async (username) => {
         }
         return animeThemes;
     } catch (error) {
-        console.log(error);
+        console.log("Error fetching themes by username: ", error);
         throw error;
     }
 }

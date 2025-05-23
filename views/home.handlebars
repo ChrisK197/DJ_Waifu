@@ -1,0 +1,18 @@
+<h1>DJ Waifu</h1>
+<form method="POST" action="/spotify/generate-playlist">
+  <p id="error">{{error}}</p>
+  <label for="username">Enter MyAnimeList Username:</label>
+  <input name="username" id="username" required>
+  <label for="isPublic">Make Playlist Public</label>
+  <input type="checkbox" name="isPublic" id="isPublic">
+  
+  {{#if notConnected}}
+    <a href="/spotify/login">Connect to Spotify</a>
+  {{else}}
+    <button type="submit" id="submit">Generate Playlist</button>
+  {{/if}}
+</form>
+<div id="loading" style="display: none;">
+  <p>Generating your playlist...</p>
+</div>
+<script src="/js/client.js"></script>
