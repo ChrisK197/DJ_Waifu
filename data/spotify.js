@@ -212,3 +212,24 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
         throw error;
     }
 }
+
+export const uploadImage = async (access_token, playlistId, imageBuffer) => {
+    try {
+        access_token = validString(access_token);
+        playlistId = validString(playlistId);
+        if (!imageBuffer || typeof imageBuffer !== 'object' || !Buffer.isBuffer(imageBuffer)) throw "Invalid playlist image";
+        const stringImage = imageBuffer.toString('base64');
+        await axios.put(`https://api.spotify.com/v1/playlists/${playlistId}/images`,
+            stringImage,
+            {
+                headers: {
+                    'Authorization': `Bearer ${access_token}`,
+                    'Content-Type': 'image/jpeg',
+                }
+            }
+            );
+    } catch (error) {
+        console.error("Error uploading image: ", error);
+        throw error;
+    }
+}

@@ -4,16 +4,20 @@ import axios from 'axios';
 import { validString, validNumber } from '../helpers.js';
 import qs from 'qs';
 import dotenv from "dotenv";
-import { getSongsFromList, getValidAccessToken, getSpotifyTokens, createPlaylist } from '../data/spotify.js';
+import { getSongsFromList, getValidAccessToken, getSpotifyTokens, createPlaylist, uploadImage } from '../data/spotify.js';
 import { getThemesByUsername } from '../data/anime.js';
+import multer from 'multer';
+
 dotenv.config();
 
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = process.env.SPOTIFY_REDIRECT_URI;
 
+const upload = multer({ limits: { fileSize: 256 * 1024 } });
+
 router.route('/login').get((req, res) => {
-    const scope = 'playlist-modify-public playlist-modify-private';
+    const scope = 'playlist-modify-public playlist-modify-private ugc-image-upload';
     const query = new URLSearchParams({
         response_type: 'code',
         client_id: client_id,
@@ -48,7 +52,7 @@ router.route('/callback').get(async (req, res) => {
         res.status(500).render('error', { code: "500", error: "Spotify authentication failed" });
     }
 });
-router.route('/generate-playlist').post(async (req, res) => {
+router.route('/generate-playlist').post(upload.single('playlistImage'), async (req, res) => {
     try {
         let {
             username,
@@ -74,6 +78,15 @@ router.route('/generate-playlist').post(async (req, res) => {
         //console.log("Song list:")
         //console.log(songList)
         const playlistInfo = await createPlaylist(access_token, req.session.userId, songList, isPublic, playlistName, playlistDescription);
+        if (req.file) {
+            try {
+                await uploadImage(access_token, playlistInfo.id, req.file.buffer);
+            } catch (error) {
+                // TODO: Alert the user
+                console.error("Failed to upload playlist image", error);
+            }
+        } else { console.log("No image"); }
+        
         console.log("Playlist Generated!")
         res.render('results', {playlist: playlistInfo})
     } catch (error) {
