@@ -151,7 +151,7 @@ export const getSongsFromList = async (access_token, songList) => {
     }
 }
 
-export const createPlaylist = async (access_token, userId, songList, isPublic=false) => {
+export const createPlaylist = async (access_token, userId, songList, isPublic=false, name="My Anime Playlist", description="This Was created by DJ Waifu using my watchlist!") => {
     try {
         access_token = validString(access_token);
         //console.log("Access token:", access_token);
@@ -162,12 +162,14 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
         //console.log(isPublic);
         //if (!isPublic || typeof isPublic !== 'boolean') throw 'isPublic must be a boolean';
         //console.log("Is public:", isPublic);
+        name = validString(name);
+        description = validString(description);
         const response = await axios.post(
             `https://api.spotify.com/v1/users/${userId}/playlists`,
             {
-                name: "My Anime Playlist",
+                name: name,
                 public: isPublic,
-                description: "This is a playlist created by DJ Waifu with all the anime openings and endings from my watchlist!",
+                description: description,
             },
             {
                 headers: {
@@ -203,6 +205,7 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
             if (!res.data.snapshot_id) throw "Failed to add to playlist";
         }
         // playlist create response
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Error creating playlist: ", error);

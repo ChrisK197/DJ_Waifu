@@ -6,21 +6,28 @@ dotenv.config();
 const client_id = process.env.MAL_CLIENT_ID;
 const client_secret = process.env.MAL_CLIENT_SECRET;
 
-export const getAnimeList = async (username) => {
+export const getAnimeList = async (username, statuses) => {
     try {
         username = validString(username);
-        const response = await axios.get(
-        `https://api.myanimelist.net/v2/users/${username}/animelist`,
-        {
-            headers: {
-                "X-MAL-CLIENT-ID": client_id
-            },
-            params: {
-                limit: 1000,
-                fields: "anime_id,list_status,anime_title",
-            },
-        });
-        return response.data.data;
+        if (!statuses || typeof statuses !== 'object' || !Array.isArray(statuses)) throw "Invalid statuses";
+        const allAnime = [];
+        for (let status of statuses) {
+            let response = await axios.get(
+            `https://api.myanimelist.net/v2/users/${username}/animelist`,
+            {
+                headers: {
+                    "X-MAL-CLIENT-ID": client_id
+                },
+                params: {
+                    limit: 1000,
+                    status: status,
+                    fields: "anime_id,list_status,anime_title",
+                },
+            });
+            allAnime.push(...response.data.data)
+        }
+        
+        return allAnime;
     } catch (error) {
         console.error("Error fetching anime list: ", error);
         throw error;
@@ -98,15 +105,17 @@ export const getThemesById = async (animeId) => {
     }
 }
 
-export const getThemesByUsername = async (username) => {
+export const getThemesByUsername = async (username, statuses, {includeOps = true, includeEds = true}) => {
     try {
         username = validString(username);
-        const animeList = await getAnimeList(username);
+        if (!statuses || typeof statuses !== 'object' || !Array.isArray(statuses)) throw "Invalid statuses";
+        if (typeof includeOps !== 'boolean' || typeof includeEds !== 'boolean') throw 'Invalide theme options';
+        const animeList = await getAnimeList(username, statuses);
         const animeThemes = [];
         for (let anime of animeList) {
             const ops = await getThemesById(anime.node.id);
-            const opening_themes = ops.opening_themes;
-            const ending_themes = ops.ending_themes;
+            const opening_themes = includeOps ? ops.opening_themes : [];
+            const ending_themes = includeEds ? ops.ending_themes : [];
             animeThemes.push(...opening_themes, ...ending_themes);
         }
         return animeThemes;

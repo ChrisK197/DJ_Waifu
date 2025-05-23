@@ -50,14 +50,30 @@ router.route('/callback').get(async (req, res) => {
 });
 router.route('/generate-playlist').post(async (req, res) => {
     try {
-        let { username, isPublic } = req.body;
+        let {
+            username,
+            statuses,
+            isPublic,
+            includeOps,
+            includeEds,
+            playlistName,
+            playlistDescription
+            } = req.body;
         isPublic = (isPublic === "on");
+        includeOps = includeOps === 'on';
+        includeEds = includeEds === 'on';
+        playlistName = playlistName === "" ? "My Anime Playlist" : playlistName;
+        playlistDescription = playlistDescription === "" ? "This Was created by DJ Waifu using my watchlist!" : playlistDescription;
+        if (!includeOps && !includeEds) {
+            return res.status(400).render('home', { error: "Please select at least one theme type (OP or ED)." });
+        }
+        const selectedStatuses = Array.isArray(statuses) ? statuses : [statuses];
         const access_token = await getValidAccessToken(req);
         //console.log("Access token:", access_token);
-        const songList = await getThemesByUsername(username);
+        const songList = await getThemesByUsername(username, selectedStatuses, {includeOps, includeEds});
         //console.log("Song list:")
         //console.log(songList)
-        const playlistInfo = await createPlaylist(access_token, req.session.userId, songList, isPublic);
+        const playlistInfo = await createPlaylist(access_token, req.session.userId, songList, isPublic, playlistName, playlistDescription);
         console.log("Playlist Generated!")
         res.render('results', {playlist: playlistInfo})
     } catch (error) {

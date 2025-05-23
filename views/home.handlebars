@@ -1,18 +1,48 @@
 <h1>DJ Waifu</h1>
+<p id="error">{{error}}</p>
+
+{{#if notConnected}}
+  <a href="/spotify/login">Connect to Spotify</a>
+{{else}}
 <form method="POST" action="/spotify/generate-playlist">
-  <p id="error">{{error}}</p>
   <label for="username">Enter MyAnimeList Username:</label>
   <input name="username" id="username" required>
+  
+  <fieldset>
+    <label for="watching">Watching</label>
+    <input type="checkbox" name="statuses" value="watching" id="watching" checked>
+    <label for="completed">Completed</label>
+    <input type="checkbox" name="statuses" value="completed" id="completed" checked>
+    <label for="on_hold">On Hold</label>
+    <input type="checkbox" name="statuses" value="on_hold" id="on_hold">
+    <label for="dropped">Drppped</label>
+    <input type="checkbox" name="statuses" value="dropped" id="dropped">
+    <label for="plan_to_watch">Plan to watch</label>
+    <input type="checkbox" name="statuses" value="plan_to_watch" id="plan_to_watch">
+  </fieldset>
+ 
+  <fieldset>
+    <label for="includeOps">Openings</label>
+    <input type="checkbox" name="includeOps" value="on" id="includeOps" checked>
+    <label for="includeEds">Endings</label>
+    <input type="checkbox" name="includeEds" value="on" id="includeEds" checked>
+  </fieldset>
+
+  <label for="playlistName">Playlist Name (optional):</label>
+  <input type="text" name="playlistName" id="playlistName" placeholder="My Anime Playlist">
+
+  <label for="playlistDescription">Description (optional):</label>
+  <textarea name="playlistDescription" id="playlistDescription" placeholder="This Was created by DJ Waifu using my watchlist!"></textarea>
+
   <label for="isPublic">Make Playlist Public</label>
   <input type="checkbox" name="isPublic" id="isPublic">
-  
-  {{#if notConnected}}
-    <a href="/spotify/login">Connect to Spotify</a>
-  {{else}}
-    <button type="submit" id="submit">Generate Playlist</button>
-  {{/if}}
+
+  <button type="submit" id="submit">Generate Playlist</button>
 </form>
+
 <div id="loading" style="display: none;">
   <p>Generating your playlist...</p>
 </div>
+{{/if}}
+
 <script src="/js/client.js"></script>

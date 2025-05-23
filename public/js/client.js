@@ -30,6 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const button = document.getElementById("submit");
     const usernameInput = document.getElementById("username");
     const errorDisplay = document.getElementById("error");
+    const checkedStatuses = document.querySelectorAll("input[name='statuses']:checked");
+    const includeOps = document.getElementById("includeOps");
+    const includeEds = document.getElementById("includeEds");
+    const playlistName = document.getElementById("playlistName");
+    const playlistDescription = document.getElementById("playlistDescription");
     errorDisplay.hidden = true;
     loading.hidden = true;
 
@@ -37,8 +42,22 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", (event) => {
             errorDisplay.hidden = true;
             loading.hidden=true;
+            if (checkedStatuses.length === 0) {
+                event.preventDefault();
+                errorDisplay.textContent = "Please select at least one list to include.";
+                errorDisplay.hidden = false;
+                return;
+            }
+            if (!includeOps.checked && !includeEds.checked) {
+                event.preventDefault();
+                errorDisplay.textContent = "Please select at least one theme type (OP or ED).";
+                errorDisplay.hidden = false;
+                return;
+            }
             try {
                 const username = validString(usernameInput.value);
+                if (playlistName.value === "") playlistName.value = "My Anime Playlist";
+                if (playlistDescription.value === "") playlistDescription.value = "This Was created by DJ Waifu using my watchlist!";
                 loading.hidden = false;
                 form.style.display = "none";
             } catch (error) {
