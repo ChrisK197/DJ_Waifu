@@ -1,0 +1,17 @@
+{
+  "name": "dj_waifu",
+  "version": "1.0.0",
+  "description": "A web application that uses the website MyAnimeList to create a playlist of anime opening and ending themes.",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "start"
+  },
+  "author": "Christopher Kalish",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
