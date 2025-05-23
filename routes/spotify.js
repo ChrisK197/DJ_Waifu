@@ -90,15 +90,30 @@ router.route('/generate-playlist').post(upload.single('playlistImage'), async (r
         console.log("Playlist Generated!")
         const updatedPlaylist = await getPlaylist(access_token, playlistInfo.id);
         console.log(updatedPlaylist);
-        const allSongsLen = songList.length;
-        const addedSongsLen = updatedPlaylist.tracks.total;
-        res.render('results', {playlist: updatedPlaylist, allSongsLen: allSongsLen , addedSongsLen: addedSongsLen, pct: (addedSongsLen/allSongsLen * 100).toFixed(2)})
+        req.session.playlistResult = {
+            playlist: updatedPlaylist,
+            allSongsLen: songList.length
+        };
+        res.redirect('/spotify/result');
     } catch (error) {
         console.error('Error creating playlist:', error);
         res.status(500).render('error', { code: "500", error: "Failed to create playlist" });
     }
 });
-router.get('/logout', (req, res) => {
+router.route("/result").get((req, res) => {
+    const result = req.session.playlistResult;
+    if (!result) {
+        return res.redirect('/');
+    }
+
+    res.render('results', {
+        playlist: result.playlist,
+        allSongsLen: result.allSongsLen,
+        addedSongsLen: result.playlist.tracks.total,
+        pct: (result.playlist.tracks.total/result.allSongsLen * 100).toFixed(2)
+    });
+});
+router.route('/logout', ).get((req, res) => {
   req.session.destroy(err => {
     if (err) {
       console.error('Failed to destroy session:', err);
@@ -106,6 +121,10 @@ router.get('/logout', (req, res) => {
     }
     res.redirect('/');
   });
+});
+router.route('/clear').get((req, res) => {
+    delete req.session.playlistResult;
+    res.redirect('/');
 });
 
 export default router;
