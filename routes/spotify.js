@@ -4,7 +4,7 @@ import axios from 'axios';
 import { validString, validNumber } from '../helpers.js';
 import qs from 'qs';
 import dotenv from "dotenv";
-import { getSongsFromList, getValidAccessToken, getSpotifyTokens, createPlaylist, uploadImage } from '../data/spotify.js';
+import { getSongsFromList, getValidAccessToken, getSpotifyTokens, createPlaylist, uploadImage, getPlaylist } from '../data/spotify.js';
 import { getThemesByUsername } from '../data/anime.js';
 import multer from 'multer';
 
@@ -88,7 +88,11 @@ router.route('/generate-playlist').post(upload.single('playlistImage'), async (r
         } else { console.log("No image"); }
         
         console.log("Playlist Generated!")
-        res.render('results', {playlist: playlistInfo})
+        const updatedPlaylist = await getPlaylist(access_token, playlistInfo.id);
+        console.log(updatedPlaylist);
+        const allSongsLen = songList.length;
+        const addedSongsLen = updatedPlaylist.tracks.total;
+        res.render('results', {playlist: updatedPlaylist, allSongsLen: allSongsLen , addedSongsLen: addedSongsLen, pct: (addedSongsLen/allSongsLen * 100).toFixed(2)})
     } catch (error) {
         console.error('Error creating playlist:', error);
         res.status(500).render('error', { code: "500", error: "Failed to create playlist" });

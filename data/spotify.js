@@ -205,7 +205,7 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
             if (!res.data.snapshot_id) throw "Failed to add to playlist";
         }
         // playlist create response
-        console.log(response.data);
+        //console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Error creating playlist: ", error);
@@ -230,6 +230,24 @@ export const uploadImage = async (access_token, playlistId, imageBuffer) => {
             );
     } catch (error) {
         console.error("Error uploading image: ", error);
+        throw error;
+    }
+}
+
+export const getPlaylist = async (access_token, playlistId) => {
+    try {
+        access_token = validString(access_token);
+        playlistId = validString(playlistId);
+        const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`,
+            { headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Content-Type': 'application/json',
+            } }
+        );
+        if (!response.data.id) throw "Failed to fetch playlist";
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching playlist:", error);
         throw error;
     }
 }
