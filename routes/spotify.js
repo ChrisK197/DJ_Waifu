@@ -70,7 +70,7 @@ router.route('/generate-playlist').post(upload.single('playlistImage'), async (r
         playlistName = playlistName === "" ? "My Anime Playlist" : playlistName;
         playlistDescription = playlistDescription === "" ? "This was created by DJ Waifu using my watchlist!" : playlistDescription;
         if (!includeOps && !includeEds) {
-            return res.status(400).render('create', { error: "Please select at least one theme type (OP or ED)." });
+            return res.status(400).render('create', { error: "Please select at least one theme type." });
         }
         const selectedStatuses = Array.isArray(statuses) ? statuses : [statuses];
         const access_token = await getValidAccessToken(req);
@@ -110,7 +110,7 @@ router.route('/update-playlist').post(async (req, res) => {
         includeOps = includeOps === 'on';
         includeEds = includeEds === 'on';
         if (!includeOps && !includeEds) {
-            return res.status(400).render('update', { error: "Please select at least one theme type (OP or ED)." });
+            return res.status(400).render('update', { error: "Please select at least one theme type." });
         }
         const selectedStatuses = Array.isArray(statuses) ? statuses : [statuses];
         const access_token = await getValidAccessToken(req);

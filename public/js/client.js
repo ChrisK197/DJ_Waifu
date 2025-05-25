@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
             isValid = false;
         }
         if (!includeOps.checked && !includeEds.checked) {
-            errorDisplay.textContent = "Please select at least one theme type (OP or ED).";
+            errorDisplay.textContent = "Please select at least one theme type.";
             errorDisplay.hidden = false;
             isValid = false;
         }
