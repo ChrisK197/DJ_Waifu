@@ -1,0 +1,61 @@
+<div class="home">
+    <h1>DJ Waifu</h1>
+    <p id="error">{{error}}</p>
+
+    {{#if notConnected}}
+        <p class="notice">Please <a href="/spotify/login">connect to Spotify</a> to get started.</p>
+    {{else}}
+    <h2 id="subtitle">Update Existing Playlist</h2>
+    <form method="POST" action="/spotify/update-playlist">
+        <label for="playlistLink">Enter your playlist link:</label>
+        <input type="text" name="playlistLink" id="playlistLink" placeholder="https://open.spotify.com/playlist/..." required>
+
+        <label for="username">Enter MyAnimeList Username:</label>
+        <input type="text" name="username" id="username" required>
+
+        <fieldset>
+            <legend>Status Filters</legend>
+            <div class="toggle-row">
+                <label for="watching">Watching</label>
+                <input type="checkbox" name="statuses" value="watching" id="watching" checked>
+            </div>
+            <div class="toggle-row">
+                <label for="completed">Completed</label>
+                <input type="checkbox" name="statuses" value="completed" id="completed" checked>
+            </div>
+            <div class="toggle-row">
+                <label for="on_hold">On Hold</label>
+                <input type="checkbox" name="statuses" value="on_hold" id="on_hold">
+            </div>
+            <div class="toggle-row">
+                <label for="dropped">Dropped</label>
+                <input type="checkbox" name="statuses" value="dropped" id="dropped">
+            </div>
+            <div class="toggle-row">
+                <label for="plan_to_watch">Plan to Watch</label>
+                <input type="checkbox" name="statuses" value="plan_to_watch" id="plan_to_watch">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Include Theme Types</legend>
+            <div class="toggle-row">
+                <label for="includeOps">Openings</label>
+                <input type="checkbox" name="includeOps" id="includeOps" value="on" checked>
+            </div>
+            <div class="toggle-row">
+                <label for="includeEds">Endings</label>
+                <input type="checkbox" name="includeEds" id="includeEds" value="on" checked>
+            </div>
+        </fieldset>
+
+        <button type="submit">Update Playlist</button>
+    </form>
+    
+    <div id="loading">
+        <img src="loading.gif" alt="Loading">
+    </div>
+    {{/if}}
+
+    <script src="/js/client.js"></script>
+</div>

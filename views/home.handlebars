@@ -1,53 +1,16 @@
 <div class="home">
   <h1>DJ Waifu</h1>
-  <p id="error">{{error}}</p>
 
   {{#if notConnected}}
-    <a href="/spotify/login">Connect to Spotify</a>
+    <p class="notice">Please <a href="/spotify/login">connect to Spotify</a> to get started.</p>
   {{else}}
-  <form method="POST" action="/spotify/generate-playlist" enctype="multipart/form-data">
-    <label for="username">Enter MyAnimeList Username:</label>
-    <input name="username" id="username" required>
-    
-    <fieldset>
-      <label for="watching">Watching</label>
-      <input type="checkbox" name="statuses" value="watching" id="watching" checked>
-      <label for="completed">Completed</label>
-      <input type="checkbox" name="statuses" value="completed" id="completed" checked>
-      <label for="on_hold">On Hold</label>
-      <input type="checkbox" name="statuses" value="on_hold" id="on_hold">
-      <label for="dropped">Drppped</label>
-      <input type="checkbox" name="statuses" value="dropped" id="dropped">
-      <label for="plan_to_watch">Plan to watch</label>
-      <input type="checkbox" name="statuses" value="plan_to_watch" id="plan_to_watch">
-    </fieldset>
-  
-    <fieldset>
-      <label for="includeOps">Openings</label>
-      <input type="checkbox" name="includeOps" value="on" id="includeOps" checked>
-      <label for="includeEds">Endings</label>
-      <input type="checkbox" name="includeEds" value="on" id="includeEds" checked>
-    </fieldset>
-
-    <label for="playlistName">Playlist Name (optional):</label>
-    <input type="text" name="playlistName" id="playlistName" placeholder="My Anime Playlist">
-
-    <label for="playlistDescription">Description (optional):</label>
-    <textarea name="playlistDescription" id="playlistDescription" placeholder="This was created by DJ Waifu using my watchlist!"></textarea>
-
-    <label for="isPublic">Make Playlist Public</label>
-    <input type="checkbox" name="isPublic" id="isPublic">
-
-    <label for="playlistImage">Upload a thumbnail image (JPEG, max 256 KB):</label>
-    <input type="file" name="playlistImage" id="playlistImage" accept="image/jpeg" />
-
-    <button type="submit" id="submit">Generate Playlist</button>
-  </form>
-
-  <div id="loading" style="display: none;">
-    <p>Generating your playlist...</p>
-  </div>
+    <div class="landing-links">
+      <a href="/create" class="createPlaylist">Create New Playlist</a>
+      <a href="/update" class="updatePlaylist">Update Existing Playlist</a>
+    </div>
   {{/if}}
+</div>
+
 
   <script src="/js/client.js"></script>
 </div>

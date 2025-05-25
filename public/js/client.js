@@ -26,45 +26,63 @@ const validNumber = (num) => {
 
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.querySelector("form");
+    if (!form) return ;
     const loading = document.getElementById("loading");
-    const button = document.getElementById("submit");
-    const usernameInput = document.getElementById("username");
     const errorDisplay = document.getElementById("error");
-    const checkedStatuses = document.querySelectorAll("input[name='statuses']:checked");
-    const includeOps = document.getElementById("includeOps");
-    const includeEds = document.getElementById("includeEds");
-    const playlistName = document.getElementById("playlistName");
-    const playlistDescription = document.getElementById("playlistDescription");
-    errorDisplay.hidden = true;
-    loading.hidden = true;
+    const subtitle = document.getElementById("subtitle");
 
-    if (form && button && usernameInput) {
-        form.addEventListener("submit", (event) => {
-            errorDisplay.hidden = true;
-            loading.hidden=true;
-            if (checkedStatuses.length === 0) {
-                event.preventDefault();
-                errorDisplay.textContent = "Please select at least one list to include.";
+    errorDisplay.hidden = true;
+    loading.style.display = "none";
+
+    form.addEventListener("submit", (event) => {
+        errorDisplay.hidden = true;
+        let isValid = true;
+
+        const checkedStatuses = document.querySelectorAll("input[name='statuses']:checked");
+        const includeOps = document.getElementById("includeOps");
+        const includeEds = document.getElementById("includeEds");
+        const usernameInput = document.getElementById("username");
+        const playlistName = document.getElementById("playlistName");
+        const playlistDescription = document.getElementById("playlistDescription");
+        const playlistLink = document.getElementById("playlistLink");
+
+        if (checkedStatuses.length === 0) {
+            errorDisplay.textContent = "Please select at least one list to include.";
+            errorDisplay.hidden = false;
+            isValid = false;
+        }
+        if (!includeOps.checked && !includeEds.checked) {
+            errorDisplay.textContent = "Please select at least one theme type (OP or ED).";
+            errorDisplay.hidden = false;
+            isValid = false;
+        }
+        try {
+            validString(usernameInput.value);
+        } catch (error) {
+            errorDisplay.textContent = "Invalid username";
+            errorDisplay.hidden = false;
+            isValid = false;
+        } 
+        if (playlistLink) {
+            const match = playlistLink.value.trim().match(/playlist\/([a-zA-Z0-9]+)/);
+            if (!match || !match[1]) {
+                errorDisplay.textContent = "Invalid Spotify URL";
                 errorDisplay.hidden = false;
-                return;
+                isValid = false;
             }
-            if (!includeOps.checked && !includeEds.checked) {
-                event.preventDefault();
-                errorDisplay.textContent = "Please select at least one theme type (OP or ED).";
-                errorDisplay.hidden = false;
-                return;
-            }
-            try {
-                const username = validString(usernameInput.value);
-                if (playlistName.value === "") playlistName.value = "My Anime Playlist";
-                if (playlistDescription.value === "") playlistDescription.value = "This was created by DJ Waifu using my watchlist!";
-                loading.hidden = false;
-                form.style.display = "none";
-            } catch (error) {
-                event.preventDefault();
-                errorDisplay.textContent = "Invalid username";
-                errorDisplay.hidden = true;
-            }
-        });
-    }
+        }
+        if (playlistName && playlistDescription) {
+            if (playlistName.value.trim() === "") playlistName.value = "My Anime Playlist";
+            if (playlistDescription.value.trim() === "") playlistDescription.value = "This was created by DJ Waifu using my watchlist!";
+        }
+
+        if (!isValid) {
+            window.scrollTo({top: 0, behavior: "smooth"})
+            event.preventDefault();
+        } else {
+            loading.style.display = "block";
+            form.style.display = "none";
+            subtitle.textContent = playlistLink ? "Updating playlist..." : "Generating playlist..."
+        }
+    });
 });

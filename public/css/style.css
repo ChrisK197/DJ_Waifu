@@ -88,6 +88,13 @@ fieldset {
     border-radius: 0.5rem;
 }
 
+legend {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #792cd1;
+  margin-bottom: 0.5rem;
+}
+
 .playlist-block {
     padding: 1rem;
     border: 1px dashed #bababa;
@@ -96,11 +103,52 @@ fieldset {
     margin: 0 auto;
 }
 
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    max-width: 100%;
+}
+
+.toggle-row input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 2.6rem;
+    height: 1.4rem;
+    background-color: #cccccc;
+    border-radius: 1rem;
+    position: relative;
+    outline: none;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.toggle-row input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.toggle-row input[type="checkbox"]:checked {
+    background-color: #792cd1;
+}
+
+.toggle-row input[type="checkbox"]:checked::before {
+    transform: translateX(1.2rem);
+}
+
 .actions {
     margin-bottom: 2rem;
 }
 
-button, .openSpotify, .homelink {
+button, .openSpotify, .homelink, .createPlaylist, .updatePlaylist {
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -114,29 +162,40 @@ button {
     cursor: pointer;
 }
 
-button, .openSpotify {
+button, .openSpotify, .createPlaylist {
     background-color: #04d435;
 }
 
-.homelink {
+.homelink, .updatePlaylist {
     background-color: #d43b04;
 }
 
-.openSpotify, .homelink {
+.openSpotify, .homelink, .createPlaylist, .updatePlaylist {
     text-decoration: none;
 }
 
-button:hover, .openSpotify:hover {
+button:hover, .openSpotify:hover, .createPlaylist:hover {
     background-color: #4cf573;
 }
 
-.homelink:hover {
+.homelink:hover, .updatePlaylist:hover {
     background-color: #eb764b;
 }
 
 .embed {
     border-radius: 1rem;
     max-width: 100%;
+}
+
+#loading {
+  display: none;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+#loading img {
+  width: 75%;
+  height: auto;
 }
 
 #error {

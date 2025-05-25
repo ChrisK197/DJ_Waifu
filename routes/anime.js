@@ -1,11 +1,18 @@
 import express from 'express';
 const router = express.Router();
-import { validString, validNumber } from '../helpers.js';
-import { getAnimeList, getAnimeById, getThemesById, getThemesByUsername } from '../data/anime.js';
+//import { getAnimeList, getAnimeById, getThemesById, getThemesByUsername } from '../data/anime.js';
 
 router.route('/').get((req, res) => {
     const notConnected = !req.session.spotify || !req.session.spotify.access_token;
     res.status(200).render('home', { notConnected });
+});
+router.route('/create').get((req, res) => {
+    const notConnected = !req.session.spotify || !req.session.spotify.access_token;
+    res.status(200).render('create', { notConnected });
+});
+router.route('/update').get((req, res) => {
+    const notConnected = !req.session.spotify || !req.session.spotify.access_token;
+    res.status(200).render('update', { notConnected });
 });
 /*router.route('/user/:username').get(async (req, res) => {
     try {

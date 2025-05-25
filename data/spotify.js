@@ -109,11 +109,7 @@ export const getSong = async (access_token, title, artist) => {
         }
         const track = response.data.tracks.items[0];
         return {
-            //name: track.name,
-            //artist: track.artists.map((a) => a.name).join(', '),
             uri: track.uri,
-            //id: track.id,
-            //url: track.external_urls.spotify
             };
     } catch (error) {
         console.error("Error fetching fetching spotify track: ", error);
@@ -123,13 +119,9 @@ export const getSong = async (access_token, title, artist) => {
 
 export const getSongsFromList = async (access_token, songList) => {
     try {
-        //console.log(access_token);
         access_token = validString(access_token);
-        //console.log(songList);
         if (!songList || typeof songList !== 'object' || !Array.isArray(songList)) throw "Invalid songList";
         let allSongs = []
-        // Structurally integral console log????
-        //console.log(songList);
         for (let song of songList) {
             if (!song || typeof song !== 'object' || !song.title) continue;
             let title = validString(song.title);
@@ -140,10 +132,8 @@ export const getSongsFromList = async (access_token, songList) => {
                 artist = "";
             }
             let result = await getSong(access_token, title, artist);
-            //console.log(result);
             if (result !== null) allSongs.push(result.uri);
         }
-        //console.log(allSongs);
         return allSongs;
     } catch (error) {
         console.error("Error fetching songs from list: ", error);
@@ -151,17 +141,12 @@ export const getSongsFromList = async (access_token, songList) => {
     }
 }
 
-export const createPlaylist = async (access_token, userId, songList, isPublic=false, name="My Anime Playlist", description="This was created by DJ Waifu using my watchlist!") => {
+export const createPlayList = async (access_token, userId, isPublic, isCollaborative, name, description) => {
     try {
         access_token = validString(access_token);
-        //console.log("Access token:", access_token);
         userId = validString(userId);
-        //console.log("User ID:", userId)
-        //console.log(songList);
-        if (!songList || typeof songList !== 'object' || !Array.isArray(songList)) throw "Invalid songList";
-        //console.log(isPublic);
-        //if (!isPublic || typeof isPublic !== 'boolean') throw 'isPublic must be a boolean';
-        //console.log("Is public:", isPublic);
+        if (isPublic === undefined || typeof isPublic !== 'boolean') throw 'isPublic must be a boolean';
+        if (isCollaborative === undefined || typeof isCollaborative !== 'boolean') throw 'isCollaborative must be a boolean';
         name = validString(name);
         description = validString(description);
         const response = await axios.post(
@@ -169,6 +154,7 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
             {
                 name: name,
                 public: isPublic,
+                collaborative: isCollaborative,
                 description: description,
             },
             {
@@ -178,18 +164,50 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
                 },
             }
         );
-        //console.log(response.data.id);
+        return response;
+    } catch (error) {
+        console.error("Error creating playlist: ", error);
+        throw error;
+    }
+}
 
-        if (!response.data.id) throw "Failed to create playlist";
-        //console.log("HERE!");
-        //console.log(songList);
+export const getPlaylistByLink = async (access_token, url) => {
+    try {
+        access_token = validString(access_token);
+        url = validString(url);
+
+        const match = url.match(/playlist\/([a-zA-Z0-9]+)/);
+        if (!match || !match[1]) throw "Invalid Spotify playlist URL format";
+        const playlistId = match[1];
+
+        const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error fetching playlist by link:", error);
+        throw error;
+    }
+}
+
+export const generateAnimePlaylist = async (access_token, userId, songList, isPublic=false, isCollaborative=false, name="My Anime Playlist", description="This was created by DJ Waifu using my watchlist!") => {
+    try {
+        access_token = validString(access_token);
+        userId = validString(userId);
+        if (!songList || typeof songList !== 'object' || !Array.isArray(songList)) throw "Invalid songList";
+        if (isPublic === undefined || typeof isPublic !== 'boolean') throw 'isPublic must be a boolean';
+        if (isCollaborative === undefined || typeof isCollaborative !== 'boolean') throw 'isCollaborative must be a boolean';
+        name = validString(name);
+        description = validString(description);
+
+        const response = await createPlayList(access_token, userId, isPublic, isCollaborative, name, description);
+
         let allSongs = await getSongsFromList(access_token, songList);
-        //console.log(allSongs);
-        //allSongs = allSongs.map(song => song.uri);
-        //console.log(allSongs);
-        // Maximum of 100 items per request
         for (let i = 0; i < allSongs.length; i += 100) {
-            //console.log(allSongs.slice(i, i + 100));
             let res = await axios.post(
                 `https://api.spotify.com/v1/playlists/${response.data.id}/tracks`,
                 {
@@ -204,11 +222,57 @@ export const createPlaylist = async (access_token, userId, songList, isPublic=fa
             );
             if (!res.data.snapshot_id) throw "Failed to add to playlist";
         }
-        // playlist create response
-        //console.log(response.data);
-        return response.data;
+        return {playlistInfo: response.data, numUploaded: allSongs.length};
     } catch (error) {
-        console.error("Error creating playlist: ", error);
+        console.error("Error generating anime playlist: ", error);
+        throw error;
+    }
+}
+
+export const updateAnimePlaylist = async(access_token, userId, songList, link) => {
+    try {
+        access_token = validString(access_token);
+        userId = validString(userId);
+        if (!songList || typeof songList !== 'object' || !Array.isArray(songList)) throw "Invalid songList";
+        link = validString(link);
+
+        const response = await getPlaylistByLink(access_token, link);
+        if (!response.data.id) throw "Failed to fetch playlist";
+        if (response.data.collaborative === false && response.data.owner.id !== userId) throw "Cannot edit playist: acces denied"
+
+        let existingSongs = new Set();
+        let nextUrl = `https://api.spotify.com/v1/playlists/${response.data.id}/tracks?fields=items(track(uri)),next&limit=100`;
+        while (nextUrl) {
+            const res = await axios.get(nextUrl, {
+                headers: { Authorization: `Bearer ${access_token}` },
+            });
+            res.data.items.forEach(item => {
+                if (item.track && item.track.uri) {
+                    existingSongs.add(item.track.uri);
+                }
+            });
+            nextUrl = res.data.next;
+        }
+        let allSongs = await getSongsFromList(access_token, songList);
+        allSongs = allSongs.filter(uri => !existingSongs.has(uri));
+        for (let i = 0; i < allSongs.length; i += 100) {
+            let res = await axios.post(
+                `https://api.spotify.com/v1/playlists/${response.data.id}/tracks`,
+                {
+                    'uris': allSongs.slice(i, i + 100),
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            if (!res.data.snapshot_id) throw "Failed to add to playlist";
+        }
+        return {playlistInfo: response.data, numUploaded:allSongs.length};
+    } catch (error) {
+        console.error("Error updating anime playlist: ", error);
         throw error;
     }
 }
@@ -234,7 +298,7 @@ export const uploadImage = async (access_token, playlistId, imageBuffer) => {
     }
 }
 
-export const getPlaylist = async (access_token, playlistId) => {
+export const getPlaylistById = async (access_token, playlistId) => {
     try {
         access_token = validString(access_token);
         playlistId = validString(playlistId);

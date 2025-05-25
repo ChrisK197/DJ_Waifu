@@ -1,0 +1,77 @@
+<div class="home">
+  <h1>DJ Waifu</h1>
+  <p id="error" hidden>{{error}}</p>
+
+  {{#if notConnected}}
+     <p class="notice">Please <a href="/spotify/login">connect to Spotify</a> to get started.</p>
+  {{else}}
+  <h2 id="subtitle">Generate New Playlist</h2>
+  <form method="POST" action="/spotify/generate-playlist" enctype="multipart/form-data">
+    <label for="username">Enter MyAnimeList Username:</label>
+    <input type="text" name="username" id="username" required>
+    
+    <fieldset>
+      <legend>Status Filters</legend>
+      <div class="toggle-row">
+        <label for="watching">Watching</label>
+        <input type="checkbox" name="statuses" value="watching" id="watching" checked>
+      </div>
+      <div class="toggle-row">
+        <label for="completed">Completed</label>
+        <input type="checkbox" name="statuses" value="completed" id="completed" checked>
+      </div>
+      <div class="toggle-row">
+        <label for="on_hold">On Hold</label>
+        <input type="checkbox" name="statuses" value="on_hold" id="on_hold">
+      </div>
+      <div class="toggle-row">
+        <label for="dropped">Dropped</label>
+        <input type="checkbox" name="statuses" value="dropped" id="dropped">
+      </div>
+      <div class="toggle-row">
+        <label for="plan_to_watch">Plan to Watch</label>
+        <input type="checkbox" name="statuses" value="plan_to_watch" id="plan_to_watch">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Include Theme Types</legend>
+      <div class="toggle-row">
+        <label for="includeOps">Openings</label>
+        <input type="checkbox" name="includeOps" id="includeOps" value="on" checked>
+      </div>
+      <div class="toggle-row">
+        <label for="includeEds">Endings</label>
+        <input type="checkbox" name="includeEds" id="includeEds" value="on" checked>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Playlist Settings</legend>
+      <label for="playlistName">Playlist Name (optional):</label>
+      <input type="text" name="playlistName" id="playlistName" placeholder="My Anime Playlist">
+      <label for="playlistDescription">Description (optional):</label>
+      <textarea name="playlistDescription" id="playlistDescription" placeholder="This was created by DJ Waifu using my watchlist!"></textarea>
+      <div class="toggle-row" style="display: none;">
+        <label for="isPublic">Make Playlist Public</label>
+        <input type="checkbox" name="isPublic" id="isPublic">
+      </div>
+      <div class="toggle-row">
+        <label for="isCollaborative">Make Playlist Collaborative</label>
+        <input type="checkbox" name="isCollaborative" id="isCollaborative">
+      </div>
+    </fieldset>
+
+    <label for="playlistImage">Upload a thumbnail image (JPEG, max 256 KB):</label>
+    <input type="file" name="playlistImage" id="playlistImage" accept="image/jpeg" />
+
+    <button type="submit" id="submit">Generate Playlist</button>
+  </form>
+
+  <div id="loading">
+    <img src="loading.gif" alt="Loading">
+  </div>
+  {{/if}}
+
+  <script src="/js/client.js"></script>
+</div>

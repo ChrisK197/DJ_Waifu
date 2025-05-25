@@ -2,9 +2,8 @@ import express from 'express';
 const router = express.Router();
 import axios from 'axios';
 import { validString, validNumber } from '../helpers.js';
-import qs from 'qs';
 import dotenv from "dotenv";
-import { getSongsFromList, getValidAccessToken, getSpotifyTokens, createPlaylist, uploadImage, getPlaylist } from '../data/spotify.js';
+import { getSongsFromList, getValidAccessToken, getSpotifyTokens, generateAnimePlaylist, updateAnimePlaylist, uploadImage, getPlaylistById } from '../data/spotify.js';
 import { getThemesByUsername } from '../data/anime.js';
 import multer from 'multer';
 
@@ -58,26 +57,25 @@ router.route('/generate-playlist').post(upload.single('playlistImage'), async (r
             username,
             statuses,
             isPublic,
+            isCollaborative,
             includeOps,
             includeEds,
             playlistName,
             playlistDescription
             } = req.body;
         isPublic = (isPublic === "on");
+        isCollaborative = (isCollaborative === "on")
         includeOps = includeOps === 'on';
         includeEds = includeEds === 'on';
         playlistName = playlistName === "" ? "My Anime Playlist" : playlistName;
         playlistDescription = playlistDescription === "" ? "This was created by DJ Waifu using my watchlist!" : playlistDescription;
         if (!includeOps && !includeEds) {
-            return res.status(400).render('home', { error: "Please select at least one theme type (OP or ED)." });
+            return res.status(400).render('create', { error: "Please select at least one theme type (OP or ED)." });
         }
         const selectedStatuses = Array.isArray(statuses) ? statuses : [statuses];
         const access_token = await getValidAccessToken(req);
-        //console.log("Access token:", access_token);
         const songList = await getThemesByUsername(username, selectedStatuses, {includeOps, includeEds});
-        //console.log("Song list:")
-        //console.log(songList)
-        const playlistInfo = await createPlaylist(access_token, req.session.userId, songList, isPublic, playlistName, playlistDescription);
+        const {playlistInfo, numUploaded} = await generateAnimePlaylist(access_token, req.session.userId, songList, isPublic, isCollaborative, playlistName, playlistDescription);
         if (req.file) {
             try {
                 await uploadImage(access_token, playlistInfo.id, req.file.buffer);
@@ -88,16 +86,52 @@ router.route('/generate-playlist').post(upload.single('playlistImage'), async (r
         } else { console.log("No image"); }
         
         console.log("Playlist Generated!")
-        const updatedPlaylist = await getPlaylist(access_token, playlistInfo.id);
-        console.log(updatedPlaylist);
+        const updatedPlaylist = await getPlaylistById(access_token, playlistInfo.id);
         req.session.playlistResult = {
             playlist: updatedPlaylist,
-            allSongsLen: songList.length
+            allSongsLen: songList.length,
+            numUploaded: numUploaded
         };
         res.redirect('/spotify/result');
     } catch (error) {
         console.error('Error creating playlist:', error);
         res.status(500).render('error', { code: "500", error: "Failed to create playlist" });
+    }
+});
+router.route('/update-playlist').post(async (req, res) => {
+    try {
+        let {
+            username,
+            playlistLink,
+            statuses,
+            includeOps,
+            includeEds
+            } = req.body;
+        includeOps = includeOps === 'on';
+        includeEds = includeEds === 'on';
+        if (!includeOps && !includeEds) {
+            return res.status(400).render('update', { error: "Please select at least one theme type (OP or ED)." });
+        }
+        const selectedStatuses = Array.isArray(statuses) ? statuses : [statuses];
+        const access_token = await getValidAccessToken(req);
+        const match = playlistLink.match(/playlist\/([a-zA-Z0-9]+)/);
+        if (!match || !match[1]) {
+            return res.status(400).render('update', { error: "Invalid playlist link." });
+        }
+        const songList = await getThemesByUsername(username, selectedStatuses, {includeOps, includeEds});
+        const {playlistInfo, numUploaded} = await updateAnimePlaylist(access_token, req.session.userId, songList, playlistLink);
+        
+        console.log("Playlist Updated!")
+        const updatedPlaylist = await getPlaylistById(access_token, playlistInfo.id);
+        req.session.playlistResult = {
+            playlist: updatedPlaylist,
+            allSongsLen: songList.length,
+            numUploaded: numUploaded
+        };
+        res.redirect('/spotify/result');
+    } catch (error) {
+        console.error('Error updating playlist:', error);
+        res.status(500).render('error', { code: "500", error: "Failed to update playlist" });
     }
 });
 router.route("/result").get((req, res) => {
@@ -109,8 +143,8 @@ router.route("/result").get((req, res) => {
     res.render('results', {
         playlist: result.playlist,
         allSongsLen: result.allSongsLen,
-        addedSongsLen: result.playlist.tracks.total,
-        pct: (result.playlist.tracks.total/result.allSongsLen * 100).toFixed(2)
+        addedSongsLen: result.numUploaded,
+        pct: (result.numUploaded/result.allSongsLen * 100).toFixed(2)
     });
 });
 router.route('/logout', ).get((req, res) => {
